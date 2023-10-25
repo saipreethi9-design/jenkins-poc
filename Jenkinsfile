@@ -29,7 +29,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
                     sh """
-                    gcloud auth activate-service-account --key-file= {GC_KEY}
+                    gcloud auth activate-service-account --key-file= ${GC_KEY}
                     docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
                     gcloud auth configure-docker us-east1-docker.pkg.dev
                     docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
