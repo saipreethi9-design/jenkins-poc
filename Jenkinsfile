@@ -28,10 +28,10 @@ pipeline {
                 withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'GC_KEY')]) {
                     script {
                         sh """
-                            gcloud auth activate-service-account --key-file=\${GC_KEY}
-                            docker tag express-app:latest \${GAR_REGION}-docker.pkg.dev/\${GCP_PROJECT_ID}/jenkins-repo/\${APP_IMAGE_NAME}:${env.BUILD_ID}
-                            gcloud auth configure-docker \${GAR_REGION}-docker.pkg.dev
-                            docker push \${GAR_REGION}-docker.pkg.dev/\${GCP_PROJECT_ID}/jenkins-repo/\${APP_IMAGE_NAME}:${env.BUILD_ID}
+                            gcloud auth activate-service-account --key-file="\$GC_KEY"
+                            docker tag express-app:latest "\${GAR_REGION}-docker.pkg.dev/\$GCP_PROJECT_ID/jenkins-repo/\$APP_IMAGE_NAME:\${BUILD_ID}"
+                            gcloud auth configure-docker "\${GAR_REGION}-docker.pkg.dev"
+                            docker push "\${GAR_REGION}-docker.pkg.dev/\$GCP_PROJECT_ID/jenkins-repo/\$APP_IMAGE_NAME:\${BUILD_ID}"
                         """
                     }
                 }
@@ -44,9 +44,9 @@ pipeline {
                     // Authenticate with Google Cloud using a service account key
                     withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'GC_KEY')]) {
                         sh """
-                            gcloud auth activate-service-account --key-file=\${GC_KEY}
-                            gcloud config set project \${GCP_PROJECT_ID}
-                            gcloud app deploy app.yaml --version \${env.BUILD_ID} --quiet
+                            gcloud auth activate-service-account --key-file="\$GC_KEY"
+                            gcloud config set project "\$GCP_PROJECT_ID"
+                            gcloud app deploy app.yaml --version "\${BUILD_ID}" --quiet
                         """
                     }
                 }
