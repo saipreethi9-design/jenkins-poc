@@ -39,6 +39,7 @@ pipeline {
 
                     }  
             }
+    }
 
     //     stage('Deploy to App Engine') {
     //         steps {
