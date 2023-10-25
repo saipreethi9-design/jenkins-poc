@@ -56,9 +56,8 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Deploy to App Engine') {
+        stage('Deploy to App Engine') {
             steps {
                 script {
                     // Authenticate with Google Cloud
