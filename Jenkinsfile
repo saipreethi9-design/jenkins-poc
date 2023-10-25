@@ -28,9 +28,8 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
-                    sh "cp ${env.GC_KEY} cred.json"
                     sh """
-                        gcloud auth activate-service-account --key-file cred.json
+                        gcloud auth activate-service-account --key-file = {GC_KEY}
                     """
                     sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
                     sh "gcloud auth configure-docker us-east1-docker.pkg.dev"
