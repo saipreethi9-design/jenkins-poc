@@ -58,6 +58,19 @@ pipeline {
         }
     }
 
+    stage('Deploy to App Engine') {
+            steps {
+                script {
+                    // Authenticate with Google Cloud
+                    sh "gcloud auth activate-service-account --key-file=${GC_KEY}"
+
+                    // Deploy the application to App Engine
+                    sh "gcloud app deploy app.yaml --project=${GCP_PROJECT_ID} --version=${env.BUILD_ID} --quiet"
+                }
+            }
+        }
+    }
+
     post {
         success {
             echo 'Pipeline succeeded!'
