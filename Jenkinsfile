@@ -5,6 +5,8 @@ pipeline {
         GCP_PROJECT_ID = 'bold-catfish-402405'
         APP_IMAGE_NAME = 'express-app'
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
+        GKE_CLUSTER_NAME = 'jenkins-poc'
+        K8S_NAMESPACE = 'default'
     }
 
     stages {
@@ -41,21 +43,28 @@ pipeline {
             }
     }
 
-    //     stage('Deploy to App Engine') {
-    //         steps {
-    //             script {
-    //                 // Authenticate with Google Cloud using a service account key
-    //                 withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'GC_KEY')]) {
-    //                     sh """
-    //                         gcloud auth activate-service-account --key-file="\$GC_KEY"
-    //                         gcloud config set project "\$GCP_PROJECT_ID"
-    //                         gcloud app deploy app.yaml --version "\${BUILD_ID}" --quiet
-    //                     """
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    stage('Deploy to GKE') {
+            steps {
+                script {
+                    // Authenticate to GKE cluster
+                    gcloud(project: GCP_PROJECT_ID, credentialsId: 'bold-catfish-402405', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
+
+                    // Set the Kubectl context to your GKE cluster
+                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
+                    
+                    sh "sed -i 's/tagversion/${env.Build_ID}/g' deployment.yaml"
+        
+                    // Apply the Kubernetes manifest to deploy the application
+                    sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
+                    sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
+                    cleanWs()
+
+                }
+            }
+        }
+        
+        
+    }
 
     post {
         success {
