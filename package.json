@@ -1,1 +1,15 @@
-
+{
+  "name": "nodejs-static-app",
+  "version": "1.0.0",
+  "description": "static node js application which does crud operations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ganesh kumar",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2"
+  }
+}
