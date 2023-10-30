@@ -25,11 +25,14 @@ pipeline {
 
         stage("Push Image to Artifact Registry") {
             steps {
-                withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
-                    sh "cp ${env.GC_KEY} cred.json"
-                }
                 script {
-                    sh "gcloud auth activate-service-account --key-file=cred.json"
+                    // Copy the Google Cloud Service Account key file to a temporary directory
+                    sh "cp \${GC_KEY} \${WORKSPACE}/cred.json"
+
+                    // Authenticate with Google Cloud using the Service Account key file
+                    sh "gcloud auth activate-service-account --key-file=\${WORKSPACE}/cred.json"
+
+                    // Tag and push the Docker image to Artifact Registry
                     sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
                     sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
                     sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
@@ -41,8 +44,8 @@ pipeline {
             steps {
                 script {
                     // Authenticate with Google Cloud using Service Account credentials
-                    withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'GC_KEY')]) {
-                        sh "gcloud auth activate-service-account --key-file=${GC_KEY}"
+                    withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'SERVICE_ACCOUNT_KEY')]) {
+                        sh "gcloud auth activate-service-account --key-file=\${SERVICE_ACCOUNT_KEY}"
                         sh "gcloud config set project ${GCP_PROJECT_ID}"
 
                         // Deploy the application to Google App Engine
