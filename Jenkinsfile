@@ -26,7 +26,7 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 script {
-                    // Copy the Google Cloud Service Account key file to a temporary directory
+                    // Copy the Google Cloud Service Account key file to the current workspace
                     sh "cp \${GC_KEY} \${WORKSPACE}/cred.json"
 
                     // Authenticate with Google Cloud using the Service Account key file
