@@ -27,7 +27,7 @@ pipeline {
 
        stage('Push Image to Artifact Registry') {
             steps {
-                withCredentials([file(credentialsId: 'jenkins-poc-400711', variable: 'GC_KEY')]) {
+                withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GC_KEY')]) {
                     sh """
                         gcloud auth activate-service-account --key-file ${GC_KEY}
                         docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
