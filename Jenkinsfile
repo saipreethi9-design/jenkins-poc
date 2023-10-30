@@ -28,7 +28,7 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
-                    sh "cp ${env:GC_KEY} cred.json"
+                    sh "cp ${env:GC_KEY} /var/jenkins_home/cred.json"
                 }
                 script {
                     sh "gcloud auth activate-service-account --key-file=cred.json"
