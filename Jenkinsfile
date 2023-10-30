@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        GCP_PROJECT_ID = 'jenkins-poc-402417'
+        GCP_PROJECT_ID = 'bold-catfish-402405'
         APP_IMAGE_NAME = 'express-app'
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
-        GKE_CLUSTER_NAME = 'multipipeline'
+        GKE_CLUSTER_NAME = 'jenkins-poc'
         K8S_NAMESPACE = 'default'
     }
 
@@ -25,15 +25,16 @@ pipeline {
             }
         }
 
-        stage('Push Image to Artifact Registry') {
+        stage("Push Image to Artifact Registry") {
             steps {
-                withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GC_KEY')]) {
-                    sh """
-                        gcloud auth activate-service-account --key-file ${GC_KEY}
-                        docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
-                        gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev
-                        docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}
-                    """
+                withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
+                    sh "cp ${env:GC_KEY} cred.json"
+                }
+                script {
+                    sh "gcloud auth activate-service-account --key-file=cred.json"
+                    sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
+                    sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
+                    sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/jenkins-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
                 }
             }
         }
@@ -42,12 +43,10 @@ pipeline {
             steps {
                 script {
                     // Authenticate to GKE cluster
-                    withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GKE_KEY')]) {
-                        sh """
-                            gcloud auth activate-service-account --key-file ${GKE_KEY}
-                            gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b
-                        """
-                    }
+                    gcloud(project: GCP_PROJECT_ID, credentialsId: 'bold-catfish-402405', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
+
+                    // Set the Kubectl context to your GKE cluster
+                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
 
                     sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
 
