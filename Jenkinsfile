@@ -26,11 +26,14 @@ pipeline {
 
         stage("Push Image to Artifact Registry") {
             steps {
+                // Clean the workspace
+                deleteDir()
+
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
-                    sh "cp \${GC_KEY} \$WORKSPACE/cred1.json"
+                    sh "cp \${GC_KEY} \${WORKSPACE}/cred1.json"
                 }
                 script {
-                    sh "gcloud auth activate-service-account --key-file=\\\$WORKSPACE/cred1.json"
+                    sh "gcloud auth activate-service-account --key-file=\${WORKSPACE}/cred1.json"
                     sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/\${GCP_PROJECT_ID}/hello-repo/\${APP_IMAGE_NAME}:${env.BUILD_ID}"
                     sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
                     sh "docker push ${GAR_REGION}-docker.pkg.dev/\${GCP_PROJECT_ID}/hello-repo/\${APP_IMAGE_NAME}:${env.BUILD_ID}"
@@ -46,7 +49,6 @@ pipeline {
                     sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
                     sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
                     sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
-                    cleanWs()
                 }
             }
         }
