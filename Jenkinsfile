@@ -25,7 +25,7 @@ pipeline {
             }
         }
 
-       stage('Push Image to Artifact Registry') {
+        stage('Push Image to Artifact Registry') {
             steps {
                 withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GC_KEY')]) {
                     sh """
@@ -42,10 +42,12 @@ pipeline {
             steps {
                 script {
                     // Authenticate to GKE cluster
-                    gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
-
-                    // Set the Kubectl context to your GKE cluster
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
+                    withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GKE_KEY')]) {
+                        sh """
+                            gcloud auth activate-service-account --key-file ${GKE_KEY}
+                            gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b
+                        """
+                    }
 
                     sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
 
