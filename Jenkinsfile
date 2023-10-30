@@ -43,11 +43,16 @@ pipeline {
 
         stage('Deploy to GKE') {
             steps {
+                withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b' )]) {
+                    sh "cp ${env:GC_KEY} cred.json"
+                    sh "ls -l"
+                }
                 script {
                     // Authenticate to GKE cluster
-                    gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
+                    // gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
                     // Set the Kubectl context to your GKE cluster
+                     sh "gcloud auth activate-service-account --key-file=cred.json"
                     sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
 
                     sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
