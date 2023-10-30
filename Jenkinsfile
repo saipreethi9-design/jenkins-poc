@@ -5,7 +5,6 @@ pipeline {
         GCP_PROJECT_ID = 'bold-catfish-402405'
         APP_IMAGE_NAME = 'express-app'
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
-        APP_ENGINE_SERVICE = 'default'
     }
 
     stages {
@@ -27,7 +26,7 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
-                    sh "cp ${env:GC_KEY} cred.json"
+                    sh "cp ${env.GC_KEY} cred.json"
                 }
                 script {
                     sh "gcloud auth activate-service-account --key-file=cred.json"
@@ -41,8 +40,9 @@ pipeline {
         stage('Deploy to App Engine') {
             steps {
                 script {
-                    // Authenticate with Google Cloud
-                    withCredentials([googleApplicationDefaultCredentials()]) {
+                    // Authenticate with Google Cloud using Service Account credentials
+                    withCredentials([file(credentialsId: 'bold-catfish-402405', variable: 'GC_KEY')]) {
+                        sh "gcloud auth activate-service-account --key-file=${GC_KEY}"
                         sh "gcloud config set project ${GCP_PROJECT_ID}"
 
                         // Deploy the application to Google App Engine
