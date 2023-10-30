@@ -7,6 +7,7 @@ pipeline {
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
         GKE_CLUSTER_NAME = 'multipipeline'
         K8S_NAMESPACE = 'default'
+        GC_KEY = credentials('jenkins-poc-402417')
     }
 
     stages {
@@ -28,10 +29,10 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
-                    // sh "cp ${env:GC_KEY} cred.json"
+                    sh "cp ${env:GC_KEY} cred.json"
                 }
                 script {
-                    sh "gcloud auth activate-service-account --key-file=$GC_KEY"
+                    sh "gcloud auth activate-service-account --key-file=cred.json"
                     sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
                     sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
                     sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
