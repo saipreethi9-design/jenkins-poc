@@ -51,15 +51,12 @@ pipeline {
                         zone: 'us-east1-b'
                     )
                     sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b --project jenkins-poc-402417" // Explicitly set the project
-
-                    // Check if deployment.yaml exists before using sed
-                    if (fileExists("deployment.yaml")) {
-                        sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
-                        sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
-                        sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
-                    } else {
-                        error("deployment.yaml not found in the workspace.")
-                    }
+                    
+                    // Specify the full path to deployment.yaml
+                    sh "sed -i 's/tagversion/${env.BUILD_ID}/g' ${WORKSPACE}/deployment.yaml"
+                    
+                    sh "kubectl apply -f ${WORKSPACE}/deployment.yaml -n ${K8S_NAMESPACE}"
+                    sh "kubectl apply -f ${WORKSPACE}/service.yaml -n ${K8S_NAMESPACE}"
                 }
             }
         }
