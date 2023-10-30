@@ -25,19 +25,22 @@ pipeline {
             }
         }
 
-        stage("Push Image to Artifact Registry") {
-            steps {
-                withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GC_KEY')]) {
-                    // sh "cp ${env:GC_KEY} cred.json"
-                }
-                script {
-                    sh "gcloud auth activate-service-account --key-file=${env:GC_KEY}"
-                    sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
-                    sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
-                    sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
-                }
+       stage("Push Image to Artifact Registry") {
+    environment {
+        GC_KEY = '' // Define GC_KEY here to make it accessible in the entire stage
+    }
+    steps {
+        withCredentials([file(credentialsId: 'jenkins-poc-402417', variable: 'GC_KEY')]) {
+            script {
+                GC_KEY = env.GC_KEY // Assign the value of GC_KEY to the environment variable
+                sh "gcloud auth activate-service-account --key-file=${GC_KEY}"
+                sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
+                sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
+                sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
             }
         }
+    }
+}
 
         stage('Deploy to GKE') {
             steps {
