@@ -48,7 +48,7 @@ pipeline {
         stage('Deploy to GKE') {
                 script {
                     // Authenticate to GKE cluster
-                    gcloud config set project jenkins-poc-402417
+                    sh "gcloud config set project ${GCP_PROJECT_ID}"
                     gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
                     // Set the Kubectl context to your GKE cluster
