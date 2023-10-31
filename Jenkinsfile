@@ -27,14 +27,13 @@ pipeline {
 
         stage("Push Image to Artifact Registry") {
             script {
-            // Cleanup the previous cred.json if it exists
-            sh "rm -f cred.json"
-        }
+                // Cleanup the previous cred.json if it exists
+                sh "rm -f cred.json"
+            }
             steps {
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
                     sh "cp ${env:GC_KEY} cred.json"
                     sh "ls -l"
-
                 }
                 script {
                     sh "gcloud auth activate-service-account --key-file=cred.json"
@@ -46,21 +45,20 @@ pipeline {
         }
 
         stage('Deploy to GKE') {
-                script {
-                    // Authenticate to GKE cluster
-                    sh "gcloud config set project ${GCP_PROJECT_ID}"
-                    gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
+            script {
+                // Authenticate to GKE cluster
+                sh "gcloud config set project ${GCP_PROJECT_ID}"
+                gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
-                    // Set the Kubectl context to your GKE cluster
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
+                // Set the Kubectl context to your GKE cluster
+                sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone us-east1-b"
 
-                    sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
+                sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"
 
-                    // Apply the Kubernetes manifest to deploy the application
-                    sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
-                    sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
-                    cleanWs()
-                }
+                // Apply the Kubernetes manifest to deploy the application
+                sh "kubectl apply -f deployment.yaml -n ${K8S_NAMESPACE}"
+                sh "kubectl apply -f service.yaml -n ${K8S_NAMESPACE}"
+                cleanWs()
             }
         }
     }
