@@ -27,6 +27,9 @@ pipeline {
 
         stage("Push Image to Artifact Registry") {
             steps {
+                 // Cleanup the previous cred.json if it exists
+                sh "rm -f cred.json"
+                
                 withCredentials([file(credentialsId: "bold-catfish-402405", variable: 'GC_KEY')]) {
                     sh "cp ${env:GC_KEY} cred.json"
                     sh "ls -l"
