@@ -28,12 +28,12 @@ pipeline {
         stage("Push Image to Artifact Registry") {
             steps {
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
-                    sh "cp ${env:GC_KEY} cred4.json"
+                    sh "cp ${env:GC_KEY} cred.json"
                     sh "ls -l"
 
                 }
                 script {
-                    sh "gcloud auth activate-service-account --key-file=cred4.json"
+                    sh "gcloud auth activate-service-account --key-file=cred.json"
                     sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
                     sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
                     sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
@@ -42,15 +42,8 @@ pipeline {
         }
 
         stage('Deploy to GKE') {
-            steps {
-                withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
-                    sh "cp ${env:GC_KEY} cred5.json"
-                    sh "ls -l"
-
-                }
                 script {
                     // Authenticate to GKE cluster
-                     sh "gcloud auth activate-service-account --key-file=cred5.json"
                     gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
                     // Set the Kubectl context to your GKE cluster
