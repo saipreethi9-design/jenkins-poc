@@ -26,6 +26,10 @@ pipeline {
         }
 
         stage("Push Image to Artifact Registry") {
+            script {
+            // Cleanup the previous cred.json if it exists
+            sh "rm -f cred.json"
+        }
             steps {
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
                     sh "cp ${env:GC_KEY} cred.json"
