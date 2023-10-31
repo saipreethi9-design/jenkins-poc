@@ -5,7 +5,7 @@ pipeline {
         GCP_PROJECT_ID = 'jenkins-poc-402417'
         APP_IMAGE_NAME = 'express-app'
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
-        GKE_CLUSTER_NAME = 'multipipeline'
+        GKE_CLUSTER_NAME = 'multi-pipeline'
         K8S_NAMESPACE = 'default'
     }
 
@@ -48,6 +48,7 @@ pipeline {
         stage('Deploy to GKE') {
                 script {
                     // Authenticate to GKE cluster
+                    gcloud config set project jenkins-poc-402417
                     gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
 
                     // Set the Kubectl context to your GKE cluster
