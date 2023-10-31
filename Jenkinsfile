@@ -26,26 +26,24 @@ pipeline {
         }
 
         stage("Push Image to Artifact Registry") {
-            script {
+            steps {
                 // Cleanup the previous cred.json if it exists
                 sh "rm -f cred.json"
-            }
-            steps {
+
                 withCredentials([file(credentialsId: "jenkins-poc-402417", variable: 'GC_KEY')]) {
                     sh "cp ${env:GC_KEY} cred.json"
                     sh "ls -l"
                 }
-                script {
-                    sh "gcloud auth activate-service-account --key-file=cred.json"
-                    sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
-                    sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
-                    sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
-                }
+
+                sh "gcloud auth activate-service-account --key-file=cred.json"
+                sh "docker tag express-app:latest ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
+                sh "gcloud auth configure-docker ${GAR_REGION}-docker.pkg.dev"
+                sh "docker push ${GAR_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/hello-repo/${APP_IMAGE_NAME}:${env.BUILD_ID}"
             }
         }
 
         stage('Deploy to GKE') {
-            script {
+            steps {
                 // Authenticate to GKE cluster
                 sh "gcloud config set project ${GCP_PROJECT_ID}"
                 gcloud(project: GCP_PROJECT_ID, credentialsId: 'jenkins-poc-402417', clusterName: GKE_CLUSTER_NAME, zone: 'us-east1-b')
