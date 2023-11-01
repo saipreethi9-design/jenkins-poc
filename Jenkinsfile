@@ -7,7 +7,7 @@ pipeline {
         GAR_REGION = 'us-east1' // Define the region for Artifact Registry
         GKE_CLUSTER_NAME = 'jenkins-poc'
         K8S_NAMESPACE = 'default'
-        
+
     }
 
     stages {
