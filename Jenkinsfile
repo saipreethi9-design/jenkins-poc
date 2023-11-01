@@ -4,10 +4,9 @@ pipeline {
     environment {
         GCP_PROJECT_ID = 'bold-catfish-402405'
         APP_IMAGE_NAME = 'express-app'
-        GAR_REGION = 'us-east1' // Define the region for Artifact Registry
+        GAR_REGION = 'us-east1' 
         GKE_CLUSTER_NAME = 'jenkins-poc'
         K8S_NAMESPACE = 'default'
-
     }
 
     stages {
