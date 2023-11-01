@@ -6,6 +6,7 @@ pipeline {
         APP_IMAGE_NAME = 'express-app'
         GAR_REGION = 'us-east1' 
         GKE_CLUSTER_NAME = 'jenkins-poc'
+    
         K8S_NAMESPACE = 'default'
     }
 
