@@ -1,0 +1,19 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/bold-catfish-402405/express-app:$BUILD_ID', '.']
+
+  # Step 2: Authenticate with Google Cloud and tag the image
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['auth', 'configure-docker', '--quiet']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['tag', 'gcr.io/bold-catfish-402405/express-app:$BUILD_ID', 'gcr.io/bold-catfish-402405/express-app:latest']
+
+  # Step 3: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/bold-catfish-402405/express-app:$BUILD_ID']
+
+  # Optionally, push the latest tagged image as well
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/bold-catfish-402405/express-app:latest']
