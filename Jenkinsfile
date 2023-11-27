@@ -7,7 +7,6 @@ pipeline {
         GKE_CLUSTER_NAME = 'jenkins-poc'
         K8S_NAMESPACE = 'default'
     }
-
     stages {
         stage('Git Checkout') {
             steps {
