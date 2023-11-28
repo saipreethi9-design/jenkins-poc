@@ -1,0 +1,20 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "sample"
+  namespace: "default"
+  labels:
+    app: "express"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "express"
+  template:
+    metadata:
+      labels:
+        app: "express"
+    spec:
+      containers:
+      - name: "express-app-sha256-1"
+        image: "us-east1-docker.pkg.dev/bold-catfish-402405/terraform-jenkins-repo/express-app:latest"
