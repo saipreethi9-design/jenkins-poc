@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: "express-app-sha256-1"
-        image: "us-east1-docker.pkg.dev/bold-catfish-402405/terraform-jenkins-repo/express-app:latest"
+        image: "us-east1-docker.pkg.dev/bold-catfish-402405/terraform-jenkins-repo/express-app:tagversion"
