@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: "express-app-sha256-1"
-        image: "us-east1-docker.pkg.dev/bold-catfish-402405/jenkins-repo/express-app:tagversion"
+        image: "us-east1-docker.pkg.dev/bold-catfish-402405/jenkins-repo/express-app:ef57380cb98d"
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
