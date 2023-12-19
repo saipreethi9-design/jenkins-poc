@@ -59,7 +59,12 @@ pipeline {
                     body: "Build ${buildStatus}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
                     to: 'saipreethi371@gmail.com',
                     attachLog: true,
-                    status: "${buildStatus == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                    conditions: [
+                        [condition: 'always'],
+                        [condition: 'failure', trigger: 'always'],
+                        [condition: 'success', trigger: 'always']
+                    ]
                 )
             }
         }
