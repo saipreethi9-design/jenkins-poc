@@ -52,7 +52,7 @@ pipeline {
     }
     post {   
         always {
-                // Send email notification regardless of build status
+            script {
                 emailext (
                     subject: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}'",
                     body: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
@@ -61,4 +61,5 @@ pipeline {
                 )
             }
         }
+     }
 }
