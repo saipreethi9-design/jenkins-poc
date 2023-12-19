@@ -52,8 +52,15 @@ pipeline {
     }
     post {
         success {
-            echo 'Pipeline succeeded!'
+             echo 'Pipeline failed!'
+            emailext (
+                subject: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}'",
+                body: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
+                to: 'saipreethipottella@gmail.com',
+                attachLog: true
+            )
         }
+        
         
         always {
                 // Send email notification regardless of build status
