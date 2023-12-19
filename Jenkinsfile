@@ -53,21 +53,16 @@ pipeline {
     post {
         success {
             echo 'Pipeline succeeded!'
-            emailext (
-                subject: 'Pipeline Succeeded',
-                body: 'Your Jenkins pipeline has succeeded!',
-                to: 'saipreethipottella@gmail.com',
-                attachLog: false
-            )
         }
-        failure {
-            echo 'Pipeline failed!'
-            emailext (
-                subject: 'Pipeline Failed',
-                body: 'Your Jenkins pipeline has failed. Please look into it!',
-                to: 'saipreethipottella@gmail.com',
-                attachLog: true
-            )
+        
+        always {
+                // Send email notification regardless of build status
+                emailext (
+                    subject: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}'",
+                    body: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
+                    to: 'saipreethi371@gmail.com',
+                    attachLog: true
+                )
+            }
         }
-    }
 }
