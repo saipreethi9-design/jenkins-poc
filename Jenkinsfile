@@ -53,11 +53,13 @@ pipeline {
     post {   
         always {
             script {
+                def buildStatus = currentBuild.currentResult
                 emailext (
-                    subject: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}'",
-                    body: "Build ${currentBuild.currentResult}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
+                    subject: "Build ${buildStatus}: Job '${env.JOB_NAME}'",
+                    body: "Build ${buildStatus}: Job '${env.JOB_NAME}' (${env.BUILD_URL})",
                     to: 'saipreethi371@gmail.com',
-                    attachLog: true
+                    attachLog: true,
+                    status: "${buildStatus == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
                 )
             }
         }
